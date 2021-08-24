@@ -1,0 +1,160 @@
+---
+- name: Rocketpool host base provisioning (security, users and dependencies)
+  hosts: rocket_pool
+  become: yes
+  tasks:
+
+# EXTEND SIZE OF ROOT (Default Ubuntu install only assigns 200GB to root filesystem)
+    - name: Extend root logical volume to use remaining space in the volume group and resize the filesystem
+      lvol:
+        vg: ubuntu-vg
+        lv: ubuntu-lv
+        size: +100%FREE
+        resizefs: true
+        force: yes
+
+# SECURE THE HOST
+    - name: Update apt repo and cache
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+    - name: Upgrade all packages
+      apt: upgrade=dist force_apt_get=yes
+
+    - name: Check if a reboot is needed
+      register: reboot_required_file
+      stat: path=/var/run/reboot-required get_md5=no
+
+    - name: Reboot the box if kernel updated
+      reboot:
+        msg: "Reboot initiated by Ansible for kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists
+
+    - name: "Setup unattended upgrades"
+      import_role:
+        name: jnv.unattended-upgrades
+      vars:
+        unattended_remove_unused_dependencies: true
+        unattended_automatic_reboot: true
+        unattended_automatic_reboot_time: "02:00"
+
+    - name: "Harden SSH"
+      import_role:
+        name: dev-sec.ssh-hardening
+
+    - name: "Harden Ubuntu"
+      import_role:
+        name: dev-sec.os-hardening
+      vars:
+        sysctl_overwrite:
+          # Enable IPv4 traffic forwarding. (for docker)
+          net.ipv4.ip_forward: 1
+
+# SETUP FIREWALL
+    - name: Install The Uncomplicated Firewall (ufw)
+      apt:
+        name: ufw
+        state: present
+    - name: Deny incoming and enable UFW
+      community.general.ufw:
+        state: enabled
+        direction: incoming
+        policy: deny
+    - name: Allow SSH, ETH1 and ETH2, Rocket Pool, Node Exporter
+      community.general.ufw:
+        state: enabled
+        rule: allow
+        port: "{{ item.port }}"
+        proto: "{{ item.proto }}"
+        comment: "{{ item.comment }}"
+      with_items:
+        - {port: 22, proto: tcp, comment: "ssh"}
+        - {port: "30303:30305", proto: tcp, comment: "Geth"}
+        - {port: "30303:30305", proto: udp, comment: "Geth"}
+        - {port: 9001, proto: tcp, comment: "Rocketpool"}
+        - {port: 9001, proto: udp, comment: "Rocketpool"}
+        - {port: 9103, proto: any, comment: "Allow node-exporter access to prometheus"}
+    - name: Allow grafana from local network
+      community.general.ufw:
+        state: enabled
+        rule: allow
+        src: 10.0.0.72/24
+        port: 3100
+        proto: tcp
+        comment: Allow grafana from local network
+
+# CREATE USER
+    - name: Create rocketpool user "rp"
+      user:
+        name: rp
+        shell: /bin/bash
+        password: $6$6cMJbzqlMhN$ChWX1/eQ5dlVy1JPAPOMCo8lfoLHRnRUhsF5FDz/FCynRo/EFJJ3BOXtyjTcrt/uMLMQqeK.rRU69XqV8HqSW/
+        groups: sudo
+
+    - name: Set authorized ssh key from local host
+      vars:
+        home_dir: "{{ lookup('env', 'HOME') }}"
+      authorized_key:
+        user: rp
+        state: present
+        key: "{{ lookup('file', '{{ home_dir }}/.ssh/id_ed25519.pub') }}"
+
+# INSTALL DEPS
+    # Needed for ansible to become unprivileged user (see: https://github.com/georchestra/ansible/issues/55#issuecomment-588313638)
+    - name: Install Access Control Lists (acl)
+      apt:
+        name: acl
+        state: present
+
+    # Needed by rocketpool installer
+    # - name: Install curl
+    #   apt:
+    #     name: curl
+    #     state: present
+
+    # - name: Install chrony
+    #   apt:
+    #     name: chrony
+    #     state: present
+
+    - name: Install Docker
+      import_role:
+        name: geerlingguy.docker
+      vars:
+        docker_users:
+          - dan
+          - rp
+
+    - name: Install fail2ban
+      apt:
+        name: fail2ban
+        state: present
+
+    - name: Add fail2ban sshd configuration
+      ini_file:
+        path: /etc/fail2ban/jail.d/ssh.local
+        section: "sshd"
+        mode: 0644
+        option: "{{ item.option }}"
+        value: "{{ item.value }}"
+      with_items:
+        - {option: "enabled", value: "true"}
+        - {option: "banaction", value: "ufw"}
+        - {option: "port", value: "22"}
+        - {option: "filter", value: "sshd"}
+        - {option: "logpath", value: "%(sshd_log)s"}
+        - {option: "maxretry", value: "5"}
+
+    - name: Restart fail2ban
+      service:
+        name: fail2ban
+        state: restarted
+
+    - name: Install nvme-cli
+      apt:
+        name: nvme-cli
+        state: present

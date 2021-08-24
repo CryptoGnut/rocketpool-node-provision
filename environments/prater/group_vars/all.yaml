@@ -1,0 +1,8 @@
+# public_ssh_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFsgdn22Z0Y4yMT2TITZ3KzkGcmZR2Uc3TDzLp9wr4P1 ted@random
+rocket_pool:
+  version: latest
+  eth1:
+    # client_data_path: eth1clientdata
+    fallback_web3provider: https://goerli.infura.io/v3/db60c273909e44d9bfbb615fb34af96f
+  # eth2:
+    # client_data_path: eth2clientdata
