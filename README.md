@@ -96,8 +96,7 @@ cd ~/git/rocketpool-node-provision
 ansible-playbook base.yaml --ask-become-pass
 ```
 
-## Install and configure Rocket Pool Smart Node Stack
+## Install and configure Rocket Pool Smart Node Stack (*This playbook is work in progress*)
 ```
-ansible-playbook <instance>.yaml install-rocketpool.yaml
+ansible-playbook install-rocketpool.yaml --ask-become-pass
 ```
-Where instance is `dev` or `prod`.

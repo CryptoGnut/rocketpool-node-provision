@@ -15,7 +15,6 @@
         mode: 0770
     - name: Install Rocket Pool Smart Node Stack
       shell: "~/bin/rocketpool service install -d -y"
-      debugger: always
     - name: Configure Rocket Pool
       blockinfile:
         path: ~/.rocketpool/settings.yml

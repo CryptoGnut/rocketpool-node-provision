@@ -121,13 +121,13 @@
     #     name: chrony
     #     state: present
 
-    - name: Install Docker
-      import_role:
-        name: geerlingguy.docker
-      vars:
-        docker_users:
-          - dan
-          - rp
+    #- name: Install Docker
+    #  import_role:
+    #    name: geerlingguy.docker
+    #  vars:
+    #    docker_users:
+    #      - dan
+    #      - rp
 
     - name: Install fail2ban
       apt:
@@ -157,4 +157,9 @@
     - name: Install nvme-cli
       apt:
         name: nvme-cli
+        state: present
+
+    - name: Install vnstat
+      apt:
+        name: vnstat
         state: present
