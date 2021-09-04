@@ -1,0 +1,7 @@
+- name: Show facts
+  hosts: miners
+  become: yes
+  tasks:
+    - name: Show facts available on the system
+      ansible.builtin.debug:
+        var: ansible_facts

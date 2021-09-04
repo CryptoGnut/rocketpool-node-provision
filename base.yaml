@@ -1,6 +1,6 @@
 ---
 - name: Rocketpool host base provisioning (security, users and dependencies)
-  hosts: rocket_pool
+  hosts: miners
   become: yes
   tasks:
 
@@ -12,6 +12,7 @@
         size: +100%FREE
         resizefs: true
         force: yes
+      when: (ansible_facts['lvm']['lvs']['ubuntu-lv']['size_g'] is defined) and (ansible_facts['lvm']['lvs']['ubuntu-lv']['size_g'] | int < 250)
 
 # SECURE THE HOST
     - name: Update apt repo and cache

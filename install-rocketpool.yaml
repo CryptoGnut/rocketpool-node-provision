@@ -1,5 +1,5 @@
 - name: Install and setup Rocket Pool, geth pruning and monitoring
-  hosts: rocket_pool
+  hosts: miners
   become: yes
   become_user: rp
   tasks:

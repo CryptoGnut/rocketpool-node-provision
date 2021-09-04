@@ -1,4 +1,4 @@
-# public_ssh_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFsgdn22Z0Y4yMT2TITZ3KzkGcmZR2Uc3TDzLp9wr4P1 ted@random
+public_ssh_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJxTeVVsTNDZxVECdvYLJKDOEA08L5xTok+r+jw0lFu3 dan@home
 rocket_pool:
   version: latest
   eth1:

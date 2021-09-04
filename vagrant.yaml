@@ -1,0 +1,8 @@
+- name: Make sure Vagrant is running
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: 'vagrant up'
+      shell: vagrant up
+      environment:
+        PUBLIC_SSH_KEY: "{{ public_ssh_key }}"
