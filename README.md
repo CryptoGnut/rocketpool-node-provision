@@ -4,9 +4,9 @@ Steps I used to provision a Rocket Pool node on my Intel NUC. For development, I
 
 ## High-level Steps
 1. [Configure Control Node](#configure-control-code)
-2. [Install Ubuntu Server 20.04 LTS on Target Node](#install-ubuntu-server-20.04-lts-on-target-node)
+2. [Install Ubuntu Server on Target Node](#install-ubuntu-server-on-target-node)
 3. [Verify SSH Access to Target Node](#verify-ssh-access-to-target-node)
-4. [Prepare Target Node O/S and Create Rocket Pool User](#prepare-target-node-o/s-and-create-rocket-pool-user)
+4. [Prepare Target Node OS and Create Rocket Pool User](#prepare-target-node-os-and-create-rocket-pool-user)
 5. [Install Rocket Pool Smart Node Stack](#install-rocket-pool-smart-node-stack)
 
 ## Configure Control Node
@@ -38,9 +38,9 @@ Close/reopen unbuntu terminal.
 ansible-galaxy collection install community.general
 ansible-galaxy install dev-sec.os-hardening dev-sec.ssh-hardening jnv.unattended-upgrades geerlingguy.docker
 ```
-## Install Ubuntu Server 20.04 LTS on Target Node
+## Install Ubuntu Server on Target Node
 ### Physical host
-Used Ubuntu in WSL2 on Windows 10 to generate an Ubuntu auto intall iso image following [this](https://gist.github.com/s3rj1k/55b10cd20f31542046018fcce32f103e) Howto. 
+Used Ubuntu in WSL2 on Windows 10 to generate an Ubuntu Server 20.04 LTS auto intall iso image following [this](https://gist.github.com/s3rj1k/55b10cd20f31542046018fcce32f103e) Howto. 
 1. Download ISO Installer:
 ```bash
 wget https://ubuntu.volia.net/ubuntu-releases/20.04.2/ubuntu-20.04.2-live-server-amd64.iso
@@ -106,7 +106,7 @@ ssh -p 2222 dan@vagrant-rp1
 ```
 *If receive `WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!`, delete offending key from `~/.ssh/known_hosts` on local host.*
 
-## Prepare Target Node O/S and Create Rocket Pool User
+## Prepare Target Node OS and Create Rocket Pool User
 ```bash
 # Cd to project directory
 cd ~/git/rocketpool-node-provision
