@@ -2,6 +2,13 @@
 
 Steps I used to provision a Rocket Pool node on my Intel NUC. For development, I used Vagrant with Oracle VM VirtualBox.  _Huge thank you to [@tedsteen](https://github.com/tedsteen) for uploading [this repo](https://github.com/CryptoGnut/rocketpool-node-provision) so I could learn from him and develop my own provisioning steps!_
 
+## High-level Steps
+1. [Configure Control Node](#configure-control-code)
+2. [Install Ubuntu Server 20.04 LTS on Target Node](#install-ubuntu-server-20.04-lts-on-target-node)
+3. [Verify SSH Access to Target Node](#verify-ssh-access-to-target-node)
+4. [Prepare Target Node O/S and Create Rocket Pool User](#prepare-target-node-o/s-and-create-rocket-pool-user)
+5. [Install Rocket Pool Smart Node Stack](#install-rocket-pool-smart-node-stack)
+
 ## Configure Control Node
 Used Ubuntu in WSL2 on Windows 10 as control node.
 ### Configure SSH
@@ -31,7 +38,7 @@ Close/reopen unbuntu terminal.
 ansible-galaxy collection install community.general
 ansible-galaxy install dev-sec.os-hardening dev-sec.ssh-hardening jnv.unattended-upgrades geerlingguy.docker
 ```
-## Install Ubuntu Server 20.04 LTS on target node
+## Install Ubuntu Server 20.04 LTS on Target Node
 ### Physical host
 Used Ubuntu in WSL2 on Windows 10 to generate an Ubuntu auto intall iso image following [this](https://gist.github.com/s3rj1k/55b10cd20f31542046018fcce32f103e) Howto. 
 1. Download ISO Installer:
@@ -88,7 +95,7 @@ xorriso -as mkisofs -r \
 ansible-playbook vagrant.yaml
 ```
 
-### Verify SSH access to target node
+### Verify SSH access to Target Node
 If physical host:
 ```bash
 ssh dan@nuc1
@@ -99,7 +106,7 @@ ssh -p 2222 dan@vagrant-rp1
 ```
 *If receive `WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!`, delete offending key from `~/.ssh/known_hosts` on local host.*
 
-## Prepare Rocket Pool node O/S and create Rocket Pool user
+## Prepare Target Node O/S and Create Rocket Pool User
 ```bash
 # Cd to project directory
 cd ~/git/rocketpool-node-provision
@@ -109,7 +116,11 @@ cd ~/git/rocketpool-node-provision
 
 # Do base provisioning 
 ansible-playbook base.yaml --ask-become-pass
+```
 
+## Install Rocket Pool Smart Node Stack
+_Work in progress_
+```bash
 # Install Rocket Pool Smart Node stack
 ansible-playbook install-rocketpool.yaml --ask-become-pass
 ```
