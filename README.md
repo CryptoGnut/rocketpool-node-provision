@@ -8,6 +8,7 @@ Steps I used to provision a Rocket Pool node on my Intel NUC. For development, I
 3. [Verify SSH Access to Target Node](#verify-ssh-access-to-target-node)
 4. [Prepare Target Node OS and Create Rocket Pool User](#prepare-target-node-os-and-create-rocket-pool-user)
 5. [Install Rocket Pool Smart Node Stack](#install-rocket-pool-smart-node-stack)
+6. [Configure Aegis Secure Key](#configure-aegis-secure-key)
 
 ## Configure Control Node
 Used Ubuntu in WSL2 on Windows 10 as control node.
@@ -123,4 +124,10 @@ _Work in progress_
 ```bash
 # Install Rocket Pool Smart Node stack
 ansible-playbook install-rocketpool.yaml --ask-become-pass
+```
+## Configure Aegis Secure Key
+Follow steps [here](https://github.com/htimsk/SecureKey) only to configure and format Secure Key.  Unlock and insert Secure Key in _always on_ USB port (blue ports on NUC).  To configure blue USB ports to remain powered through reboot and shutdown, enable "USB S4/S5 Power" under "Secondary Power Settings" in the BIOS. Then run following playbook which will stop rocketpool, move `~/.rocketpool/data` to Secure Key, and then restart rocketpool.
+```bash
+# Move ~/.rocketpool/data to Secure Key
+ansible-playbook configure-secure-key.yaml --ask-become-pass
 ```
