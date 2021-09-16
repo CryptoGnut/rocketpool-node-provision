@@ -3,9 +3,9 @@
   become: yes
   become_user: rp
   vars:
-    data_dir_path: /home/rp/.rocketpool/data
-    tmp_dir_path: /home/rp/.rocketpool/tmp
-    secure_key_device_file: /dev/sda1
+    data_dir: /home/rp/.rocketpool/data
+    tmp_dir: /home/rp/.rocketpool/tmp
+    secure_key_bsf: /dev/sda1
   tasks:
     - name: Mount the Secure Key
       block:
@@ -14,53 +14,43 @@
             mount_names: "{{ ansible_mounts | map(attribute='mount') | list}}"
         - name: Abort if Secure Key already mounted
           fail:
-            msg: "Error!  Secure Key is already mounted at '{{ data_dir_path }}'."
-          when: data_dir_path in mount_names
+            msg: "Error!  Secure Key is already mounted at '{{ data_dir }}'."
+          when: data_dir in mount_names
   
         - name: Check that Secure Key is inserted and unlocked
           stat:
-            path: '{{ secure_key_device_file }}'
+            path: '{{ secure_key_bsf }}'
           register: skbf
-        - name: Fail if block special file {{ secure_key_device_file }} does not exist
+        - name: Fail if block special file {{ secure_key_bsf }} does not exist
           fail:
             msg: "Error!  Secure Key must be inserted and unlocked."
           when: skbf.stat.isblk is not defined or skbf.stat.isblk != true
-  
-        - name: Create {{ tmp_dir_path }} directory if it does not exist
-          file:
-            path: '{{ tmp_dir_path }}'
-            state: directory
-            mode: '0775'
-
-        - name: Mount {{ secure_key_device_file }} as {{ tmp_dir_path }} 
-          ansible.posix.mount:
-            path: '{{ tmp_dir_path }}'
-            src: '{{ secure_key_device_file }}'
-            fstype: ext4
-            state: mounted
       become: yes
       become_user: root
 
     - name: Stop Rocket Pool service
       shell: ~/bin/rocketpool service stop -y
-    - name: Swap secure key mount
+    - name: Mount the Secure Key
       block:
-        - name: Move the data folder to tmp mount point
-          shell: mv {{ data_dir_path }}/* {{ tmp_dir_path }}/
-        - name: Unmount {{ tmp_dir_path }} 
+        - name: Move {{ data_dir }} to {{ tmp_dir }}
+          shell: mv {{ data_dir }} {{ tmp_dir }}
+        - name: Create {{ data_dir }} directory
+          file:
+            path: '{{ data_dir }}'
+            state: directory
+            mode: '0775'
+        - name: Mount {{ secure_key_bsf }} as {{ data_dir }} 
           ansible.posix.mount:
-            path: '{{ tmp_dir_path }}'
-            state: unmounted
-        - name: Remove {{ tmp_dir_path }}
-          ansible.builtin.file:
-            path: '{{ tmp_dir_path }}'
-            state: absent
-        - name: Mount {{ secure_key_device_file }} as {{ data_dir_path }} 
-          ansible.posix.mount:
-            path: '{{ data_dir_path }}'
-            src: '{{ secure_key_device_file }}'
+            path: '{{ data_dir }}'
+            src: '{{ secure_key_bsf }}'
             fstype: ext4
             state: mounted
+        - name: Copy {{ tmp_dir }}/* to {{ data_dir }}
+          shell: cp -pr {{ tmp_dir }}/* {{ data_dir }}
+        - name: Delete {{ tmp_dir }} 
+          file:
+            path: '{{ tmp_dir }}'
+            state: absent
       become: yes
       become_user: root
     - name: Start Rocket Pool service
