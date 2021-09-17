@@ -7,12 +7,12 @@
       file:
         state: directory
         path: ~/bin
-        mode: 0770
+        mode: '0770'
     - name: Download Rocket Pool CLI
       get_url:
         url: https://github.com/rocket-pool/smartnode-install/releases/{{ rocket_pool.version }}/download/rocketpool-cli-linux-amd64
         dest: ~/bin/rocketpool
-        mode: 0770
+        mode: '0770'
     - name: Install Rocket Pool Smart Node Stack
       shell: "~/bin/rocketpool service install -d -y"
     - name: Configure Rocket Pool
@@ -69,11 +69,11 @@
             - env: GRAFANA_PORT
               value: "3100"
 
-    - name: Configure beacon client with fallback web3 provider
+    - name: "Set Lighthouse beacon client fallback web3 provider to '{{ rocket_pool.eth1.fallback_web3provider }}'"
       lineinfile:
         path: ~/.rocketpool/chains/eth2/start-beacon.sh
-        regexp: '^(.*\/app\/cmd\/beacon-chain\/beacon-chain )(?:--fallback-web3provider=\S* )?(.*)'
-        line: "\\1--fallback-web3provider={{ rocket_pool.eth1.fallback_web3provider }} \\2"
+        regexp: '^(.*\/usr\/local\/bin\/lighthouse beacon .*)(?:--eth1-endpoints \S* )(.*)'
+        line: "\\1--eth1-endpoints $ETH1_PROVIDER,{{ rocket_pool.eth1.fallback_web3provider }} \\2"
         backrefs: yes
 
     - name: Copy geth prune script
@@ -91,39 +91,8 @@
     #    user: "rp"
     #    job: "~/bin/prune_geth.sh"
 
-    #- name: Copy monitoring docker stack
-    #  copy:
-    #    src: ./monitoring/
-    #    dest: ~/rocketpool_monitoring/
-
-    #- name: Configue geth for Prometheus monitoring
-    #  lineinfile:
-    #    path: ~/.rocketpool/chains/eth1/start-node.sh
-    #    regexp: '^(.*\/usr\/local\/bin\/geth )(?:--metrics --pprof --pprof.addr \d+\.\d+\.\d+\.\d+ )?(.*)'
-    #    line: "\\1--metrics --pprof --pprof.addr 0.0.0.0 \\2"
-    #    backrefs: yes
-
-    #- name: Configure Prysm beacon for Prometheus monitoring
-    #  lineinfile:
-    #    path: ~/.rocketpool/chains/eth2/start-beacon.sh
-    #    regexp: '^(.*\/app\/cmd\/beacon-chain\/beacon-chain )(?:--monitoring-host \d+\.\d+\.\d+\.\d+ )?(.*)'
-    #    line: "\\1--monitoring-host 0.0.0.0 \\2"
-    #    backrefs: yes
-
-    #- name: Configure Prysm validator for Prometheus monitoring
-    #  lineinfile:
-    #    path: ~/.rocketpool/chains/eth2/start-validator.sh
-    #    regexp: '^(.*/app/cmd/validator/validator )(?:--monitoring-host \d+\.\d+\.\d+\.\d+ )?(.*)'
-    #    line: "\\1--monitoring-host 0.0.0.0 \\2"
-    #    backrefs: yes
-
     #- name: Start Rocket Pool service
     #  shell: ~/bin/rocketpool service start
-
-    #- name: Start the monitoring stack
-    #  shell: docker-compose -f rocketpool_monitoring/docker-compose.yaml up -d --build --remove-orphans
-    #  args: 
-    #    chdir: ~
 
 #    - name: TODO - wait for eth1 and eth2 to be in sync
 #      shell: echo "TODO - wait for eth1 & eth2"
