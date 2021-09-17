@@ -1,0 +1,45 @@
+#cloud-config
+autoinstall:
+  package_upgrade: true
+  apt:
+    geoip: true
+    preserve_sources_list: false
+    primary:
+      - arches: [amd64, i386]
+        uri: http://us.archive.ubuntu.com/ubuntu
+      - arches: [default]
+        uri: http://ports.ubuntu.com/ubuntu-ports
+  identity: 
+    hostname: nuc1
+    password: <Encrytped password. Use "mkpasswd -m sha-512" to encrypt.>
+    realname: Dan
+    username: dan
+  keyboard: 
+    layout: us
+    toggle: ''
+    variant: ''
+  refresh-installer:
+    update: yes
+  network:
+    version: 2
+    renderer: networkd
+    ethernets:
+      eno1:
+        addresses:
+          - 10.0.0.72/24
+        gateway4: 10.0.0.1
+        nameservers:
+          search:
+            - hsd1.co.comcast.net
+          addresses:
+            - 75.75.75.75
+            - 75.75.75.76
+  ssh:
+    allow-pw: true
+    authorized-keys:
+      - <SSH public key>
+    install-server: true
+  user-data:
+    timezone: America/Denver
+  locale: en_US
+  version: 1
