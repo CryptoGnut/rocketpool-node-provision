@@ -31,10 +31,14 @@ alias loadkey='eval "$(ssh-agent -s)"; ssh-add ~/.ssh/id_ed25519'
 ### Install Ansible and dependencies
 I used `pip` instead of `apt` to install Ansible to gain access to newer Ansible version.
 ```bash
-sudo apt install python3-pip
+sudo apt install -y python3-pip
 pip3 install --user ansible
 ```
-Close/reopen unbuntu terminal.
+Add `export PATH="$PATH:~/.local/bin"` to ~/.bashrc.  Then activate in current shell.
+```bash
+source ~/.bashrc
+```
+Then.
 ```bash
 ansible-galaxy collection install community.general
 ansible-galaxy install dev-sec.os-hardening dev-sec.ssh-hardening jnv.unattended-upgrades geerlingguy.docker

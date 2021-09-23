@@ -14,7 +14,7 @@
         dest: ~/bin/rocketpool
         mode: '0770'
     - name: Install Rocket Pool Smart Node Stack
-      shell: "~/bin/rocketpool service install -d -y"
+      shell: "{{ rocket_pool.install_command }}"
     - name: Configure Rocket Pool
       blockinfile:
         path: ~/.rocketpool/settings.yml
