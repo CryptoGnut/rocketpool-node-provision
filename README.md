@@ -1,6 +1,6 @@
 # Rocket Pool Node Provisioning
 
-Steps I used to provision a Rocket Pool node on my Intel NUC. For development, I used Vagrant with Oracle VM VirtualBox.  _Huge thank you to [@tedsteen](https://github.com/tedsteen) for uploading [this repo](https://github.com/CryptoGnut/rocketpool-node-provision) so I could learn from him and develop my own provisioning steps!_
+Steps I used to provision a Rocket Pool node on my Intel NUC. For development, I initially used Vagrant with Oracle VM VirtualBox then switched to using Proxmox VMs.  _Huge thank you to [@tedsteen](https://github.com/tedsteen) for uploading [this repo](https://github.com/CryptoGnut/rocketpool-node-provision) so I could learn from him and develop my own provisioning steps!_
 
 ## High-level Steps
 1. [Configure Control Node](#configure-control-code)
@@ -11,12 +11,14 @@ Steps I used to provision a Rocket Pool node on my Intel NUC. For development, I
 6. [Configure Aegis Secure Key](#configure-aegis-secure-key)
 
 ## Configure Control Node
-Used Ubuntu in WSL2 on Windows 10 as control node.
+Used Ubuntu client as control node.
 ### Configure SSH
 1. 	Add host mappings to /etc/hosts:
 ```bash
 # Physical Rocket Pool host - Fixed IP address
 10.0.0.72        nuc1
+# Proxmox Rocket Pool VM - Fixed IP address
+10.0.0.73        rocketpool-1
 # Vagrant Rocket Pool VM - Not sure how Vagrant chose this IP address 
 172.19.208.1     vagrant-rp1
 ```
@@ -101,7 +103,6 @@ ansible-playbook vagrant.yaml
 ```
 
 ### Verify SSH access to Target Node
-If physical host:
 ```bash
 ssh dan@nuc1
 ```
@@ -125,6 +126,13 @@ ansible-playbook base.yaml --ask-become-pass
 
 ## Install Rocket Pool Smart Node Stack
 _Work in progress_
+```bash
+# Set rp user password on target node
+ssh dan@<target-node-ip>
+sudo passwd rp
+exit
+```
+
 ```bash
 # Install Rocket Pool Smart Node stack
 ansible-playbook install-rocketpool.yaml --ask-become-pass
