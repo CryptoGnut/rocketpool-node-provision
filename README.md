@@ -68,7 +68,7 @@ mkdir -p iso/nocloud/
 touch iso/nocloud/meta-data
 ```
 
-5. Copy [user-data](iso/nocloud/user-data) file to `iso/nocloud/user-data`. *Review/update user-data file before proceeding.  Encrypted password and SSH public key are missing and must be provided.*
+5. Copy and rename appropriate `user-data` file from [iso/nocloud/](iso/nocloud/) in this repo to `iso/nocloud/user-data`. *Review/update user-data file before proceeding.  Encrypted password is missing and must be provided.*
 
 6. Update boot flags with cloud-init autoinstall:
 ```bash

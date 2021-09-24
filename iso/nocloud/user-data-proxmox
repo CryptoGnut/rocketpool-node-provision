@@ -1,0 +1,48 @@
+#cloud-config
+autoinstall:
+  package_upgrade: true
+  apt:
+    geoip: true
+    preserve_sources_list: false
+    primary:
+      - arches: [amd64, i386]
+        uri: http://us.archive.ubuntu.com/ubuntu
+      - arches: [default]
+        uri: http://ports.ubuntu.com/ubuntu-ports
+  identity: 
+    hostname: rocketpool-1
+    password: <Encrytped password. Use "mkpasswd -m sha-512" to encrypt.>
+    realname: Dan
+    username: dan
+  keyboard: 
+    layout: us
+    toggle: ''
+    variant: ''
+  refresh-installer:
+    update: yes
+  network:
+    version: 2
+    renderer: networkd
+    ethernets:
+      ens18:
+        addresses:
+          - 10.0.0.73/24
+        gateway4: 10.0.0.1
+        nameservers:
+          search:
+            - hsd1.co.comcast.net
+          addresses:
+            - 75.75.75.75
+            - 75.75.75.76
+  ssh:
+    allow-pw: true
+    authorized-keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVhk+S2VHWjiT+n7raIt9FvIpKRPFf6zY/0usBXMfDa dan@rocketpool
+    install-server: true
+  user-data:
+    timezone: America/Denver
+  locale: en_US
+  version: 1
+  late-commands:
+    - curtin in-target --target=/target -- apt-get -qq update
+    - curtin in-target --target=/target -- apt-get -y install qemu-guest-agent 

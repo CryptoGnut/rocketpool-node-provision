@@ -37,7 +37,7 @@ autoinstall:
   ssh:
     allow-pw: true
     authorized-keys:
-      - <SSH public key>
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVhk+S2VHWjiT+n7raIt9FvIpKRPFf6zY/0usBXMfDa dan@rocketpool
     install-server: true
   user-data:
     timezone: America/Denver
