@@ -70,30 +70,26 @@
         state: enabled
         rule: allow
         port: "{{ item.port }}"
-        proto: "{{ item.proto }}"
         comment: "{{ item.comment }}"
       with_items:
-        - {port: 22, proto: tcp, comment: "ssh"}
-        - {port: "30303:30305", proto: tcp, comment: "Geth"}
-        - {port: "30303:30305", proto: udp, comment: "Geth"}
-        - {port: 9001, proto: tcp, comment: "Rocketpool"}
-        - {port: 9001, proto: udp, comment: "Rocketpool"}
-        - {port: 9103, proto: any, comment: "Allow node-exporter access to prometheus"}
-    - name: Allow grafana from local network
-      community.general.ufw:
-        state: enabled
-        rule: allow
-        src: 10.0.0.72/24
-        port: 3100
-        proto: tcp
-        comment: Allow grafana from local network
+        - {port: 22, comment: "ssh"}
+        - {port: 30303, comment: "Geth"}
+        - {port: 9001, comment: "Rocketpool"}
+        - {port: 9103, comment: "Allow node-exporter access to prometheus"}
+    #- name: Allow grafana from local network
+    #  community.general.ufw:
+    #    state: enabled
+    #    rule: allow
+    #    src: 10.0.0.72/24
+    #    port: 3100
+    #    proto: tcp
+    #    comment: Allow grafana from local network
 
 # CREATE USER
     - name: Create rocketpool user "rp"
       user:
         name: rp
         shell: /bin/bash
-        password: $6$6cMJbzqlMhN$ChWX1/eQ5dlVy1JPAPOMCo8lfoLHRnRUhsF5FDz/FCynRo/EFJJ3BOXtyjTcrt/uMLMQqeK.rRU69XqV8HqSW/
         groups: sudo
 
     - name: Set authorized ssh key from local host
@@ -112,23 +108,24 @@
         state: present
 
     # Needed by rocketpool installer
-    # - name: Install curl
-    #   apt:
-    #     name: curl
-    #     state: present
+    - name: Install curl
+      apt:
+        name: curl
+        state: present
 
-    # - name: Install chrony
-    #   apt:
-    #     name: chrony
-    #     state: present
+    - name: Install chrony
+      apt:
+        name: chrony
+        state: present
 
-    #- name: Install Docker
-    #  import_role:
-    #    name: geerlingguy.docker
-    #  vars:
-    #    docker_users:
-    #      - dan
-    #      - rp
+    - name: Install Docker
+      import_role:
+        name: geerlingguy.docker
+      vars:
+        docker_compose_version: "1.29.2"
+        docker_users:
+          - dan
+          - rp
 
     - name: Install fail2ban
       apt:
