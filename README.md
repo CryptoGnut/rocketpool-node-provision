@@ -46,7 +46,7 @@ ansible-galaxy collection install community.general
 ansible-galaxy install dev-sec.os-hardening dev-sec.ssh-hardening jnv.unattended-upgrades geerlingguy.docker
 ```
 ## Install Ubuntu Server on Target Node
-### Target Node that is not Vagrant
+### Target node is not Vagrant VM
 Generate Ubuntu Server 20.04 LTS auto intall iso image.  Following steps adapted from [this](https://gist.github.com/s3rj1k/55b10cd20f31542046018fcce32f103e) Howto. 
 1. Download Ubuntu Server 20.04.3 ISO from https://ubuntu.com/download/server.
 2. Extract ISO using 7z:
@@ -98,7 +98,7 @@ sudo apt install usb-creator-gtk
 11. Burn iso image to USB flash drive using Startup Disk Creator (launched from Ubuntu start menu).
 12. Boot Rocket Pool node from USB flash drive image to complete the unattended install.
 
-### Target Node is Vagrant VM
+### Target node is Vagrant VM
 ```bash
 ansible-playbook vagrant.yaml
 ```
