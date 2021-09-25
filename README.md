@@ -46,29 +46,22 @@ ansible-galaxy collection install community.general
 ansible-galaxy install dev-sec.os-hardening dev-sec.ssh-hardening jnv.unattended-upgrades geerlingguy.docker
 ```
 ## Install Ubuntu Server on Target Node
-### Physical host
-Used Ubuntu in WSL2 on Windows 10 to generate an Ubuntu Server 20.04 LTS auto intall iso image following [this](https://gist.github.com/s3rj1k/55b10cd20f31542046018fcce32f103e) Howto. 
-1. Download ISO Installer:
+### Target Node that is not Vagrant
+Generate Ubuntu Server 20.04 LTS auto intall iso image.  Following steps adapted from [this](https://gist.github.com/s3rj1k/55b10cd20f31542046018fcce32f103e) Howto. 
+1. Download Ubuntu Server 20.04.3 ISO from https://ubuntu.com/download/server.
+2. Extract ISO using 7z:
 ```bash
-wget https://ubuntu.volia.net/ubuntu-releases/20.04.2/ubuntu-20.04.2-live-server-amd64.iso
+7z x ubuntu-20.04.3-live-server-amd64.iso -x'![BOOT]' -oiso
 ```
-
-2. Create ISO distribution directory:
+3. Create ISO distribution directory:
 ```bash
 mkdir -p iso/nocloud/
 ```
-
-3. Extract ISO using 7z:
-```bash
-7z x ubuntu-20.04.2-live-server-amd64.iso -x'![BOOT]' -oiso
-```
-
 4. Create empty meta-data file:
 ```bash
 touch iso/nocloud/meta-data
 ```
-
-5. Copy and rename appropriate `user-data` file from [iso/nocloud/](iso/nocloud/) in this repo to `iso/nocloud/user-data`. *Review/update user-data file before proceeding.  Encrypted password is missing and must be provided.*
+5. Copy [user-data](iso/nocloud/user-data) file (*there are two, one for nuc and one for Proxmox VM*) to `iso/nocloud/user-data`. *Review/update user-data file before proceeding.  Encrypted password and SSH public key are missing and must be provided.*
 
 6. Update boot flags with cloud-init autoinstall:
 ```bash
@@ -81,11 +74,16 @@ sed -i 's|---|autoinstall ds=nocloud;s=/cdrom/nocloud/ ---|g' iso/isolinux/txt.c
 md5sum iso/.disk/info > iso/md5sum.txt
 sed -i 's|iso/|./|g' iso/md5sum.txt
 ```
-8. Create Install ISO from extracted dir:
+8. Install following packages (if not already installed):
+```bash
+sudo apt install xorriso
+sudo apt install isolinux
+```
+9. Create Install autoinstall ISO from extracted dir:
 ```bash
 xorriso -as mkisofs -r \
   -V Ubuntu\ custom\ amd64 \
-  -o ubuntu-20.04.2-live-server-amd64-autoinstall.iso \
+  -o ubuntu-20.04.3-live-server-amd64-autoinstall.iso \
   -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot \
   -boot-load-size 4 -boot-info-table \
   -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot \
@@ -93,11 +91,14 @@ xorriso -as mkisofs -r \
   -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin  \
   iso/boot iso
 ```
-9. Burn iso image to USB flash drive using Rufus on Windows.
-![Rufus](Rufus.png)
-10. Boot Rocket Pool node from USB flash drive image to complete the unattended install.
+10. Install "Startup Disk Creator" (if not already installed):
+```bash
+sudo apt install usb-creator-gtk
+```
+11. Burn iso image to USB flash drive using Startup Disk Creator (launched from Ubuntu start menu).
+12. Boot Rocket Pool node from USB flash drive image to complete the unattended install.
 
-### Vagrant VM
+### Target Node is Vagrant VM
 ```bash
 ansible-playbook vagrant.yaml
 ```
