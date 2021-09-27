@@ -1,0 +1,8 @@
+public_ssh_key: <SSH Public Key for your Ansible remote user>
+rocket_pool:
+  version: latest
+  install_command: ~/bin/rocketpool service install -n prater -d -y
+  eth1:
+    fallback_web3provider: <Endpoint URL for backup Eth1 provider>
+  prometheus:
+    data_path: prometheus-data

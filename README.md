@@ -3,14 +3,15 @@
 Steps I used to provision a Rocket Pool node on my Intel NUC. For development, I initially used Vagrant with Oracle VM VirtualBox then switched to using Proxmox VMs.  _Huge thank you to [@tedsteen](https://github.com/tedsteen) for uploading [this repo](https://github.com/CryptoGnut/rocketpool-node-provision) so I could learn from him and develop my own provisioning steps!_
 
 ## High-level Steps
-1. [Configure Control Node](#configure-control-code)
-2. [Install Ubuntu Server on Target Node](#install-ubuntu-server-on-target-node)
+1. [Configure Ansible Control Node](#configure-ansible-control-code)
+2. [Install Ubuntu Server on Ansible Target Node](#install-ubuntu-server-on-ansible-target-node)
 3. [Verify SSH Access to Target Node](#verify-ssh-access-to-target-node)
-4. [Prepare Target Node OS and Create Rocket Pool User](#prepare-target-node-os-and-create-rocket-pool-user)
-5. [Install Rocket Pool Smart Node Stack](#install-rocket-pool-smart-node-stack)
-6. [Configure Aegis Secure Key](#configure-aegis-secure-key)
+4. [Configure Ansible environment](#configure-ansible-environment)
+5. [Prepare Target Node OS and Create Rocket Pool User](#prepare-target-node-os-and-create-rocket-pool-user)
+6. [Install Rocket Pool Smart Node Stack](#install-rocket-pool-smart-node-stack)
+7. [Configure Aegis Secure Key](#configure-aegis-secure-key)
 
-## Configure Control Node
+## Configure Ansible Control Node
 Used Ubuntu client as control node.
 ### Configure SSH
 1. 	Add host mappings to /etc/hosts:
@@ -45,7 +46,7 @@ Then.
 ansible-galaxy collection install community.general
 ansible-galaxy install dev-sec.os-hardening dev-sec.ssh-hardening jnv.unattended-upgrades geerlingguy.docker
 ```
-## Install Ubuntu Server on Target Node
+## Install Ubuntu Server on Ansible Target Node
 ### Target node is not Vagrant VM
 Generate Ubuntu Server 20.04 LTS auto intall iso image.  Following steps adapted from [this](https://gist.github.com/s3rj1k/55b10cd20f31542046018fcce32f103e) Howto. 
 1. Download Ubuntu Server 20.04.3 ISO from https://ubuntu.com/download/server.
@@ -113,14 +114,22 @@ ssh -p 2222 dan@vagrant-rp1
 ```
 *If receive `WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!`, delete offending key from `~/.ssh/known_hosts` on local host.*
 
-## Prepare Target Node OS and Create Rocket Pool User
+## Configure Ansible environment
 ```bash
 # Cd to project directory
 cd ~/git/rocketpool-node-provision
 
-# Configure environment.  For vagrant: ./env.sh vagrant
-./env.sh <environment> <target-node-ip>
+# Copy example.yaml to <environment>.yaml. <environment> could be "prod", "proxmox", "vagrant", etc.
+cd inventory/group_vars
+cp example.yaml <environment>.yaml
+# Update variables in <environment>.yaml as appropriate.
 
+# Source environment.  For vagrant: ./env.sh vagrant
+./env.sh <environment> <target-node-ip>
+```
+
+## Prepare Target Node OS and Create Rocket Pool User
+```bash
 # Do base provisioning 
 ansible-playbook base.yaml --ask-become-pass
 ```
