@@ -45,7 +45,7 @@
                 value: ""
             eth2:
               client:
-                selected: lighthouse
+                selected: teku
                 params:
                 - env: CUSTOM_GRAFFITI
                   value: ""
@@ -69,12 +69,19 @@
             - env: GRAFANA_PORT
               value: "3100"
 
-    - name: "Set Lighthouse beacon client fallback web3 provider to '{{ rocket_pool.eth1.fallback_web3provider }}'"
+    - name: "Set Teku beacon client fallback web3 provider to '{{ rocket_pool.eth1.fallback_web3provider }}' and initial state to {{ rocket_pool.eth2.teku_initial_state }}"
       lineinfile:
         path: ~/.rocketpool/chains/eth2/start-beacon.sh
-        regexp: '^(.*\/usr\/local\/bin\/lighthouse beacon .*)(?:--eth1-endpoints \S* )(.*)'
-        line: "\\1--eth1-endpoints $ETH1_PROVIDER,{{ rocket_pool.eth1.fallback_web3provider }} \\2"
+        regexp: '^(.*\/opt\/teku\/bin\/teku .*)(?:--eth1-endpoints{0,1}=\S* (?:--initial-state=\S*)?)(.*)'
+        line: "\\1--eth1-endpoints=$ETH1_PROVIDER,{{ rocket_pool.eth1.fallback_web3provider }} --initial-state={{ rocket_pool.eth2.teku_initial_state }} \\2"
         backrefs: yes
+
+    #- name: "Set Lighthouse beacon client fallback web3 provider to '{{ rocket_pool.eth1.fallback_web3provider }}'"
+    #  lineinfile:
+    #    path: ~/.rocketpool/chains/eth2/start-beacon.sh
+    #    regexp: '^(.*\/usr\/local\/bin\/lighthouse beacon .*)(?:--eth1-endpoints \S* )(.*)'
+    #    line: "\\1--eth1-endpoints $ETH1_PROVIDER,{{ rocket_pool.eth1.fallback_web3provider }} \\2"
+    #    backrefs: yes
 
     - name: Copy geth prune script
       copy:

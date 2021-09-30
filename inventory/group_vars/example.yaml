@@ -4,5 +4,7 @@ rocket_pool:
   install_command: ~/bin/rocketpool service install -n prater -d -y
   eth1:
     fallback_web3provider: <Endpoint URL for backup Eth1 provider>
+  eth2:
+    teku_initial_state: https://<Infura ETH2 Project Id>:<Infura ETH2 Project Secret>@eth2-beacon-mainnet.infura.io/eth/v1/debug/beacon/states/finalized
   prometheus:
     data_path: prometheus-data
