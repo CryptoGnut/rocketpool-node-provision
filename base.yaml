@@ -45,14 +45,16 @@
 
     - name: "Harden SSH"
       import_role:
-        name: dev-sec.ssh-hardening
+        name: devsec.hardening.ssh_hardening
 
     - name: "Harden Ubuntu"
       import_role:
-        name: dev-sec.os-hardening
+        name: devsec.hardening.os_hardening
       vars:
+        # Override default umask of 027 for Docker
+        os_env_umask: '022'
         sysctl_overwrite:
-          # Enable IPv4 traffic forwarding. (for docker)
+          # Enable IPv4 traffic forwarding for Docker
           net.ipv4.ip_forward: 1
 
 # SETUP FIREWALL

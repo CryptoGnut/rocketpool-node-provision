@@ -43,8 +43,8 @@ source ~/.bashrc
 ```
 Then.
 ```bash
-ansible-galaxy collection install community.general
-ansible-galaxy install dev-sec.os-hardening dev-sec.ssh-hardening jnv.unattended-upgrades geerlingguy.docker
+ansible-galaxy collection install community.general devsec.hardening
+ansible-galaxy install jnv.unattended-upgrades geerlingguy.docker
 ```
 ## Install Ubuntu Server on Ansible Target Node
 ### Target node is not Vagrant VM
