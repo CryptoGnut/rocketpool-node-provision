@@ -9,7 +9,8 @@ Steps I used to provision a Rocket Pool node on my Intel NUC. For development, I
 4. [Configure Ansible environment](#configure-ansible-environment)
 5. [Prepare Target Node OS and Create Rocket Pool User](#prepare-target-node-os-and-create-rocket-pool-user)
 6. [Install Rocket Pool Smart Node Stack](#install-rocket-pool-smart-node-stack)
-7. [Configure Aegis Secure Key](#configure-aegis-secure-key)
+7. [Install Operating System and Rocket Pool update tracker for Grafana](#install-operating-system-and-rocket-pool-update-tracker-for-grafana)
+8. [Configure Aegis Secure Key](#configure-aegis-secure-key)
 
 ## Configure Ansible Control Node
 Used Ubuntu client as control node.
@@ -147,6 +148,20 @@ exit
 # Install Rocket Pool Smart Node stack
 ansible-playbook install-rocketpool.yaml --ask-become-pass
 ```
+
+## Install Operating System and Rocket Pool update tracker for Grafana
+*This step performed manually as it requires sudo access.  I tried various approaches including running playbook as root with `--allow-root` option, it still failed with 'rocketpool should not be run as root' warning.*
+```bash
+# Login to target node
+ssh rp@<target-node-ip>
+
+# Install update tracker
+~/bin/rocketpool service install-update-tracker -y
+
+# Restart container
+docker restart rocketpool_exporter
+```
+
 ## Configure Aegis Secure Key
 Follow steps [here](https://github.com/htimsk/SecureKey) only to configure and format Secure Key.  Unlock and insert Secure Key in _always on_ USB port (blue ports on NUC).  To configure blue USB ports to remain powered through reboot and shutdown, enable "USB S4/S5 Power" under "Secondary Power Settings" in the BIOS. Then run following playbook which will stop rocketpool, move `~/.rocketpool/data` to Secure Key, and then restart rocketpool.
 ```bash
