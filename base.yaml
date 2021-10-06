@@ -168,3 +168,37 @@
       apt:
         name: jq
         state: present
+
+    - name: Install apcupsd
+      apt:
+        name: apcupsd
+        state: present
+        
+    # Unset DEVICE so APCUPSD will search for proper USB port
+    - name: "Unset DEVICE"
+      lineinfile:
+        path: /etc/apcupsd/apcupsd.conf
+        regexp: '^(DEVICE)'
+        line: "\\1"
+        backrefs: yes
+
+    # Setting these high so Aegis Secure Key will remain powered after host is shutdown.  
+    # Cable modem will continue to consume battery.
+    - name: "Set BATTERYLEVEL to 30"
+      lineinfile:
+        path: /etc/apcupsd/apcupsd.conf
+        regexp: '^(BATTERYLEVEL) \d+'
+        line: "\\1 30"
+        backrefs: yes
+
+    - name: "Set MINUTES to 40"
+      lineinfile:
+        path: /etc/apcupsd/apcupsd.conf
+        regexp: '^(MINUTES) \d+'
+        line: "\\1 40"
+        backrefs: yes
+
+    - name: Restart apcupsd
+      service:
+        name: apcupsd
+        state: restarted
