@@ -23,65 +23,53 @@
           chains:
             eth1:
               client:
-              selected: geth
-              params:
-              - env: ETHSTATS_LABEL
+                selected: geth
+                params:
+                - env: ETHSTATS_LABEL
                 value: ""
-              - env: ETHSTATS_LOGIN
+                - env: ETHSTATS_LOGIN
                 value: ""
-              - env: GETH_CACHE_SIZE
-                value: ""
-              - env: GETH_MAX_PEERS
-                value: ""
-              - env: ETH1_P2P_PORT
+                - env: GETH_CACHE_SIZE
+                value: "1024"
+                - env: GETH_MAX_PEERS
+                value: "50"
+                - env: ETH1_P2P_PORT
                 value: "30303"
-              - env: INFURA_PROJECT_ID
+                - env: INFURA_PROJECT_ID
                 value: ""
-              - env: POCKET_PROJECT_ID
+                - env: POCKET_PROJECT_ID
                 value: ""
-              - env: HTTP_PROVIDER_URL
+                - env: HTTP_PROVIDER_URL
                 value: ""
-              - env: WS_PROVIDER_URL
+                - env: WS_PROVIDER_URL
                 value: ""
             eth2:
               client:
                 selected: teku
                 params:
                 - env: CUSTOM_GRAFFITI
-                  value: ""
+                value: ""
+                - env: ETH2_CHECKPOINT_SYNC_URL
+                value: {{ eth2_checkpoint_sync_url }}
                 - env: ETH2_MAX_PEERS
-                  value: ""
+                value: "74"
                 - env: ETH2_P2P_PORT
-                  value: "9001"
+                value: "9001"
           metrics:
             enabled: true
             settings:
             - env: ETH2_METRICS_PORT
-              value: "9100"
+            value: "9100"
             - env: VALIDATOR_METRICS_PORT
-              value: "9101"
+            value: "9101"
             - env: NODE_METRICS_PORT
-              value: "9102"
+            value: "9102"
             - env: EXPORTER_METRICS_PORT
-              value: "9103"
+            value: "9103"
             - env: PROMETHEUS_PORT
-              value: "9091"
+            value: "9091"
             - env: GRAFANA_PORT
-              value: "3100"
-
-    - name: "Set Teku beacon client fallback web3 provider to '{{ rocket_pool.eth1.fallback_web3provider }}' and initial state to {{ rocket_pool.eth2.teku_initial_state }}"
-      lineinfile:
-        path: ~/.rocketpool/chains/eth2/start-beacon.sh
-        regexp: '^(.*\/opt\/teku\/bin\/teku .*)(?:--eth1-endpoints{0,1}=\S* (?:--initial-state=\S*)?)(.*)'
-        line: "\\1--eth1-endpoints=$ETH1_PROVIDER,{{ rocket_pool.eth1.fallback_web3provider }} --initial-state={{ rocket_pool.eth2.teku_initial_state }} \\2"
-        backrefs: yes
-
-    #- name: "Set Lighthouse beacon client fallback web3 provider to '{{ rocket_pool.eth1.fallback_web3provider }}'"
-    #  lineinfile:
-    #    path: ~/.rocketpool/chains/eth2/start-beacon.sh
-    #    regexp: '^(.*\/usr\/local\/bin\/lighthouse beacon .*)(?:--eth1-endpoints \S* )(.*)'
-    #    line: "\\1--eth1-endpoints $ETH1_PROVIDER,{{ rocket_pool.eth1.fallback_web3provider }} \\2"
-    #    backrefs: yes
+            value: "3100"
 
     - name: Copy geth prune script
       copy:
