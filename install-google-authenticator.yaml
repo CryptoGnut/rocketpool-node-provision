@@ -1,0 +1,52 @@
+- name: Install and configure Two-Factor Authentication for SSH with Google Authenticator
+  hosts: miners
+  become: yes
+  tasks:
+
+    - name: Install libpam-google-authenticator
+      apt:
+        name: libpam-google-authenticator
+        state: present
+        
+    # Configure PAM to use Google Authenticator
+    - name: "Comment out common-auth"
+      lineinfile:
+        path: /etc/pam.d/sshd
+        regexp: '^(@include common-auth)'
+        line: "#\\1"
+        backrefs: yes
+
+    - name: "Add Google Authenticator module"
+      blockinfile:
+        path: /etc/pam.d/sshd
+        insertafter: '^#@include common-auth'
+        block: |
+          # Enable Google Authenticator
+          auth required pam_google_authenticator.so
+
+    # Configure SSH to use Google Authenticator
+    - name: "Enable challenge-response passwords"
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^(ChallengeResponseAuthentication) \w+'
+        line: "\\1 yes"
+        backrefs: yes
+
+    - name: "Use both an SSH key and the Google Authenticator code"
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^(AuthenticationMethods publickey)$'
+        line: "#\\1"
+        backrefs: yes
+
+    - name: "Use both an SSH key and the Google Authenticator code for external access"
+      blockinfile:
+        path: /etc/ssh/sshd_config
+        insertafter: '^#AuthenticationMethods publickey$'
+        block: |
+          # Use both an SSH key and the Google Authenticator code
+          AuthenticationMethods publickey,keyboard-interactive
+          Match Address 10.0.0.0/24
+            AuthenticationMethods publickey
+          Match all
+            

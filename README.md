@@ -11,6 +11,7 @@ Steps I used to provision a Rocket Pool node on my Intel NUC. For development, I
 6. [Install Rocket Pool Smart Node Stack](#install-rocket-pool-smart-node-stack)
 7. [Install Operating System and Rocket Pool update tracker for Grafana](#install-operating-system-and-rocket-pool-update-tracker-for-grafana)
 8. [Configure Aegis Secure Key](#configure-aegis-secure-key)
+9. [Configure 2FA with Google Authenticator for SSH](#configure-2fa-with-google-authenticator-for-ssh)
 
 ## Configure Ansible Control Node
 Used Ubuntu client as control node.
@@ -167,4 +168,18 @@ Follow steps [here](https://github.com/htimsk/SecureKey) only to configure and f
 ```bash
 # Move ~/.rocketpool/data to Secure Key
 ansible-playbook configure-secure-key.yaml --ask-become-pass
+```
+
+## Configure 2FA with Google Authenticator for SSH
+Running the following playbook will install Google Authenticator and configure sshd to use it for ssh access by external addresses.  *I chose not to do this as Ansible does not work with 2FA.*
+```bash
+ansible-playbook install-google-authenticator.yaml --ask-become-pass
+```
+To complete setup after running this playbook, generate Google Authenticator codes by running:
+```bash
+google-authenticator
+```
+Then restart sshd:
+```bash
+sudo systemctl restart sshd
 ```
