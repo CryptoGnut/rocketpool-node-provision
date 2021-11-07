@@ -1,6 +1,6 @@
 # Rocket Pool Node Provisioning
 
-Steps I used to provision a Rocket Pool node on my Intel NUC. For development, I initially used Vagrant with Oracle VM VirtualBox then switched to using Proxmox VMs.  _Huge thank you to [@tedsteen](https://github.com/tedsteen) for uploading [this repo](https://github.com/CryptoGnut/rocketpool-node-provision) so I could learn from him and develop my own provisioning steps!_
+Steps I used to provision a Rocket Pool node on my Intel NUC. For development, I initially used Vagrant with Oracle VM VirtualBox then switched to using Proxmox VMs.  _Huge thank you to [@tedsteen](https://github.com/tedsteen) for uploading [this repo](https://github.com/tedsteen/rocketpool) so I could learn from him and develop my own provisioning steps!_
 
 ## High-level Steps
 1. [Configure Ansible Control Node](#configure-ansible-control-code)
